@@ -1,0 +1,24 @@
+syntax = "proto3";
+import "open-im/pkg/proto/sdk_ws/ws.proto";
+option go_package = "./user;user";
+package user;
+
+message CommonResp{
+  int32  errCode = 1;
+  string errMsg = 2;
+}
+
+message GetUserInfoReq{
+  repeated string userIDList = 1;
+  string OpUserID = 2;
+  string OperationID = 3;
+}
+
+message GetUserInfoResp{
+  CommonResp  commonResp = 1;
+  repeated server_api_params.UserInfo UserInfoList = 3;
+}
+
+service user {
+  rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+}

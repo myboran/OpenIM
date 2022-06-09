@@ -1,0 +1,2 @@
+2022-06-09 10:51:34.849[36m [INFO] [PID:7128] [FilePath:user/user.go:37] [OperationID:0] [0m[ rpc user start...]
+2022-06-09 10:51:34.853[36m [INFO] [PID:7128] [FilePath:user/user.go:45] [OperationID:0] [0m[listen network success, address  172.28.5.193:10100 0xc0006ac5d0]
