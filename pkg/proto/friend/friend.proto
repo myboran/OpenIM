@@ -1,0 +1,25 @@
+syntax = "proto3";
+import "open-im/pkg/proto/sdk_ws/ws.proto";
+option go_package = "./friend;friend";
+package friend;
+
+message CommID{
+  string OpUserID = 1;
+  string OperationID = 2;
+  string ToUserID = 4;
+  string FromUserID = 5;
+}
+
+message GetFriendListReq{
+  CommID CommID = 1;
+}
+
+message GetFriendListResp{
+  int32   ErrCode = 1;
+  string  ErrMsg = 2;
+  repeated server_api_params.FriendInfo FriendInfoList = 3;
+}
+
+service friend{
+  rpc getFriendList(GetFriendListReq) returns(GetFriendListResp);
+}

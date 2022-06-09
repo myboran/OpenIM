@@ -19,8 +19,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UpdateUserInfo(c *gin.Context) {
-	fmt.Println("user.UpdateUserInfo")
+func GetUsersInfo(c *gin.Context) {
+	fmt.Println("user.GetUsersInfo")
 	params := api.GetUsersInfoReq{}
 	if err := c.BindJSON(&params); err != nil {
 		log.NewError("0", "BindJSON failed ", err.Error())
@@ -64,5 +64,41 @@ func UpdateUserInfo(c *gin.Context) {
 
 	resp.Data = jsonData.JsonDataList(resp.UserInfoList)
 	log.NewInfo(req.OperationID, "GetUserInfo api return ", resp)
+	c.JSON(http.StatusOK, resp)
+}
+
+func UpdateUserInfo(c *gin.Context) {
+	params := api.UpdateSelfUserInfoReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.NewError("0", "BindJSON failed ", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"errCode": http.StatusBadRequest, "errMsg": err.Error()})
+		return
+	}
+
+	req := &rpc.UpdateUserInfoReq{UserInfo: &sdkws.UserInfo{}}
+	utils.CopyStructFields(req.UserInfo, &params)
+
+	req.OperationID = params.OperationId
+	var ok bool
+	ok, req.OpUserID = token_verify.GetUserIDFromToken(c.Request.Header.Get("token"), req.OperationID)
+	if !ok {
+		log.NewError(req.OperationID, "GetUserIDFromToken false", c.Request.Header.Get("token"))
+		c.JSON(http.StatusInternalServerError, gin.H{"errCode": http.StatusInternalServerError, "errMsg": "GetUserIDFromToken failed"})
+		return
+	}
+
+	log.NewInfo(params.OperationId, "UpdateUserInfo args", req.String())
+
+	etcdConn := getcdv3.GetConn(config.Config.Etcd.EtcdSchema, strings.Join(config.Config.Etcd.EtcdAddr, ","), config.Config.RpcRegisterName.OpenImUserName)
+	client := rpc.NewUserClient(etcdConn)
+	RpcResp, err := client.UpdateUserInfo(context.Background(), req)
+	if err != nil {
+		log.NewError(req.OperationID, "UpdateUserInfo failed ", err.Error(), req.String())
+		c.JSON(http.StatusInternalServerError, gin.H{"errCode": 500, "errMsg": "call  rpc server failed"})
+		return
+	}
+
+	resp := api.UpdateUserInfoResp{CommResp: api.CommResp{ErrCode: RpcResp.CommonResp.ErrCode, ErrMsg: RpcResp.CommonResp.ErrMsg}}
+	log.NewInfo(req.OperationID, "UpdateUserInfo api return ", resp)
 	c.JSON(http.StatusOK, resp)
 }

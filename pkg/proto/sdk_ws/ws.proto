@@ -23,3 +23,60 @@ message UserInfo{
   int32 appMangerLevel = 10;
 }
 
+message FriendInfo{
+  string ownerUserID = 1;
+  string remark = 2;
+  uint32 createTime = 3;
+  UserInfo friendUser = 4;
+  int32 addSource = 5;
+  string operatorUserID = 6;
+  string ex = 7;
+}
+
+message TipsComm{
+  bytes detail = 1;
+  string defaultTips = 2;
+  string jsonDetail = 3;
+}
+
+//////////////////////user/////////////////////
+message UserInfoUpdatedTips{
+  string userID = 1;
+}
+
+//////////////////////conversation/////////////////////
+message ConversationUpdateTips{
+  string UserID = 1;
+
+}
+
+///////////////////////////////////base end/////////////////////////////////////
+
+message MsgData {
+  string  sendID = 1;
+  string  recvID = 2;
+  string groupID = 3;
+  string clientMsgID = 4;
+  string serverMsgID = 5;
+  int32 senderPlatformID = 6;
+  string  senderNickname = 7;
+  string  senderFaceURL = 8;
+  int32   sessionType = 9;
+  int32 msgFrom = 10;
+  int32 contentType = 11;
+  bytes content = 12;
+  uint32 seq = 14;
+  int64 sendTime = 15;
+  int64 createTime = 16;
+  int32 status = 17;
+  map<string, bool> options = 18;
+  OfflinePushInfo offlinePushInfo = 19;
+}
+
+message OfflinePushInfo{
+  string title = 1;
+  string desc = 2;
+  string ex = 3;
+  string iOSPushSound = 4;
+  bool iOSBadgeCount = 5;
+}

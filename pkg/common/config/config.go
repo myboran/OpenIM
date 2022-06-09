@@ -44,7 +44,7 @@ type config struct {
 	}
 	RpcRegisterName struct {
 		OpenImStatisticsName         string `yaml:"OpenImStatisticsName"`
-		OpenImUserName               string `yaml:"openImUserName"`
+		OpenImUserName               string `yaml:"openImUserName"` // #
 		OpenImFriendName             string `yaml:"openImFriendName"`
 		OpenImOfflineMessageName     string `yaml:"openImOfflineMessageName"`
 		OpenImPushName               string `yaml:"openImPushName"`
@@ -69,6 +69,154 @@ type config struct {
 		ElasticSearchUser     string   `yaml:"elasticSearchUser"`
 		ElasticSearchPassword string   `yaml:"elasticSearchPassword"`
 	}
+	Manager struct {
+		AppManagerUid []string `yaml:"appManagerUid"`
+		Secrets       []string `yaml:"secrets"`
+	}
+
+	IOSPush struct {
+		PushSound  string `yaml:"pushSound"`
+		BadgeCount bool   `yaml:"badgeCount"`
+	}
+
+	Notification struct {
+		///////////////////////group/////////////////////////////
+		GroupCreated struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupCreated"`
+
+		GroupInfoSet struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupInfoSet"`
+
+		JoinGroupApplication struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"joinGroupApplication"`
+
+		MemberQuit struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"memberQuit"`
+
+		GroupApplicationAccepted struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupApplicationAccepted"`
+
+		GroupApplicationRejected struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupApplicationRejected"`
+
+		GroupOwnerTransferred struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupOwnerTransferred"`
+
+		MemberKicked struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"memberKicked"`
+
+		MemberInvited struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"memberInvited"`
+
+		MemberEnter struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"memberEnter"`
+
+		GroupDismissed struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"groupDismissed"`
+
+		////////////////////////user///////////////////////
+		UserInfoUpdated struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"userInfoUpdated"`
+
+		//////////////////////friend///////////////////////
+		FriendApplication struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendApplicationAdded"`
+		FriendApplicationApproved struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendApplicationApproved"`
+
+		FriendApplicationRejected struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendApplicationRejected"`
+
+		FriendAdded struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendAdded"`
+
+		FriendDeleted struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendDeleted"`
+		FriendRemarkSet struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"friendRemarkSet"`
+		BlackAdded struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"blackAdded"`
+		BlackDeleted struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"blackDeleted"`
+		ConversationOptUpdate struct {
+			Conversation PConversation `yaml:"conversation"`
+			OfflinePush  POfflinePush  `yaml:"offlinePush"`
+			DefaultTips  PDefaultTips  `yaml:"defaultTips"`
+		} `yaml:"conversationOptUpdate"`
+	}
+}
+type PConversation struct {
+	ReliabilityLevel int  `yaml:"reliabilityLevel"`
+	UnreadCount      bool `yaml:"unreadCount"`
+}
+type POfflinePush struct {
+	PushSwitch bool   `yaml:"switch"`
+	Title      string `yaml:"title"`
+	Desc       string `yaml:"desc"`
+	Ext        string `yaml:"ext"`
+}
+type PDefaultTips struct {
+	Tips string `yaml:"tips"`
 }
 
 func init() {

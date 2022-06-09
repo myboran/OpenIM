@@ -5,6 +5,7 @@ import (
 	"open-im/pkg/common/constant"
 	commonDB "open-im/pkg/common/db"
 	"open-im/pkg/common/log"
+	"open-im/pkg/utils"
 
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -88,4 +89,14 @@ func ParseToken(tokensString string) (claims *Claims, err error) {
 		}
 	}
 	return nil, &constant.ErrTokenUnknown
+}
+
+func CheckAccess(OpUserID string, OwnerUserID string) bool {
+	if utils.IsContain(OpUserID, config.Config.Manager.AppManagerUid) {
+		return true
+	}
+	if OpUserID == OwnerUserID {
+		return true
+	}
+	return false
 }

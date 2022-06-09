@@ -19,6 +19,17 @@ message GetUserInfoResp{
   repeated server_api_params.UserInfo UserInfoList = 3;
 }
 
+message UpdateUserInfoReq{
+  server_api_params.UserInfo UserInfo = 1;
+  string OpUserID = 2;
+  string  operationID = 3;
+}
+
+message UpdateUserInfoResp{
+  CommonResp  commonResp = 1;
+}
+
 service user {
   rpc GetUserInfo(GetUserInfoReq) returns (GetUserInfoResp);
+  rpc UpdateUserInfo(UpdateUserInfoReq) returns(UpdateUserInfoResp);
 }

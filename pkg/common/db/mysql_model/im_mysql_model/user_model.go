@@ -14,3 +14,12 @@ func GetUserByUserID(userID string) (*db.User, error) {
 	}
 	return &user, nil
 }
+
+func UpdateUserInfo(user db.User) error {
+	dbConn, err := db.DB.MysqlDB.DefaultGormDB()
+	if err != nil {
+		return err
+	}
+	dbConn.LogMode(true)
+	return dbConn.Table("users").Where("user_id=?", user.UserID).Update(&user).Error
+}

@@ -18,6 +18,7 @@ func main() {
 	r.Use(utils.CorsHandler())
 	userRouterGroup := r.Group("/user")
 	{
+		userRouterGroup.POST("/get_user_info", user.GetUsersInfo)
 		userRouterGroup.POST("/update_user_info", user.UpdateUserInfo)
 	}
 	// TODO

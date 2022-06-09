@@ -1,0 +1,23 @@
+syntax = "proto3";
+import "open-im/pkg/proto/sdk_ws/ws.proto";
+option go_package = "./chat;pbChat";
+package pbChat;
+
+
+message SendMsgReq {
+  string token =1;
+  string operationID = 2;
+  server_api_params.MsgData msgData = 3;
+}
+
+message SendMsgResp {
+  int32 errCode = 1;
+  string errMsg = 2;
+  string serverMsgID = 4;
+  string clientMsgID = 5;
+  int64  sendTime = 6;
+}
+
+service Chat{
+  rpc SendMsg(SendMsgReq) returns(SendMsgResp);
+}
