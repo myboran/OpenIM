@@ -135,3 +135,23 @@ func NewInfo(OperationID string, args ...interface{}) {
 		"PID":         logger.Pid,
 	}).Infoln(args)
 }
+
+//Deprecated
+func ErrorByKv(tipInfo, OperationID string, args ...interface{}) {
+	fields := make(logrus.Fields)
+	argsHandle(OperationID, fields, args)
+	logger.WithFields(fields).Error(tipInfo)
+}
+
+//internal method
+func argsHandle(OperationID string, fields logrus.Fields, args []interface{}) {
+	for i := 0; i < len(args); i += 2 {
+		if i+1 < len(args) {
+			fields[fmt.Sprintf("%v", args[i])] = args[i+1]
+		} else {
+			fields[fmt.Sprintf("%v", args[i])] = ""
+		}
+	}
+	fields["OperationID"] = OperationID
+	fields["PID"] = logger.Pid
+}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"open-im/internal/api/friend"
 	"open-im/internal/api/user"
 	"open-im/pkg/common/log"
 	"open-im/pkg/utils"
@@ -20,6 +21,13 @@ func main() {
 	{
 		userRouterGroup.POST("/get_user_info", user.GetUsersInfo)
 		userRouterGroup.POST("/update_user_info", user.UpdateUserInfo)
+		userRouterGroup.POST("/get_self_user_info", user.GetSelfUserInfo)
+	}
+
+	friendRouterGroup := r.Group("/friend")
+	{
+		friendRouterGroup.POST("/add_friend", friend.AddFriend)
+		friendRouterGroup.POST("/delete_friend", friend.DeleteFriend)
 	}
 	// TODO
 	//apiThird.MinioInit()

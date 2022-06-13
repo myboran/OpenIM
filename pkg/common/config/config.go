@@ -18,6 +18,12 @@ var (
 	Config config
 )
 
+type callBackConfig struct {
+	Enable                 bool `yaml:"enable"`
+	CallbackTimeOut        int  `yaml:"callbackTimeOut"`
+	CallbackFailedContinue bool `yaml:"callbackFailedContinue"`
+}
+
 type config struct {
 	ServerIP string `yaml:"serverip"`
 	Redis    struct {
@@ -78,7 +84,32 @@ type config struct {
 		PushSound  string `yaml:"pushSound"`
 		BadgeCount bool   `yaml:"badgeCount"`
 	}
-
+	Kafka struct {
+		Ws2mschat struct {
+			Addr  []string `yaml:"addr"`
+			Topic string   `yaml:"topic"`
+		}
+		Ms2pschat struct {
+			Addr  []string `yaml:"addr"`
+			Topic string   `yaml:"topic"`
+		}
+		ConsumerGroupID struct {
+			MsgToMongo string `yaml:"msgToMongo"`
+			MsgToMySql string `yaml:"msgToMySql"`
+			MsgToPush  string `yaml:"msgToPush"`
+		}
+	}
+	MessageVerify struct {
+		FriendVerify bool `yaml:"friendVerify"`
+	}
+	Callback struct {
+		CallbackUrl                 string         `yaml:"callbackUrl"`
+		CallbackBeforeSendSingleMsg callBackConfig `yaml:"callbackbeforeSendSingleMsg"`
+		CallbackAfterSendSingleMsg  callBackConfig `yaml:"callbackAfterSendSingleMsg"`
+		CallbackBeforeSendGroupMsg  callBackConfig `yaml:"callbackBeforeSendGroupMsg"`
+		CallbackAfterSendGroupMsg   callBackConfig `yaml:"callbackAfterSendGroupMsg"`
+		CallbackWordFilter          callBackConfig `yaml:"callbackWordFilter"`
+	} `yaml:"callback"`
 	Notification struct {
 		///////////////////////group/////////////////////////////
 		GroupCreated struct {

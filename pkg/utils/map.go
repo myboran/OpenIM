@@ -6,3 +6,10 @@ func SetSwitchFromOptions(options map[string]bool, key string, value bool) {
 	}
 	options[key] = value
 }
+
+func GetSwitchFromOptions(Options map[string]bool, key string) (result bool) {
+	if flag, ok := Options[key]; !ok || flag {
+		return true
+	}
+	return false
+}

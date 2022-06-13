@@ -26,6 +26,10 @@ func JsonDataList(resp interface{}) []map[string]interface{} {
 	return result
 }
 
+func JsonDataOne(pb proto.Message) map[string]interface{} {
+	return ProtoToMap(pb, false)
+}
+
 func ProtoToMap(pb proto.Message, idFix bool) map[string]interface{} {
 	marshaler := jsonpb.Marshaler{
 		OrigName:     true,

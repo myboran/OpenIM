@@ -94,3 +94,17 @@ func UserInfoUpdatedNotification(operationID, userID string, needNotifiedUserID 
 	commID := pbFriend.CommID{FromUserID: userID, ToUserID: needNotifiedUserID, OpUserID: userID, OperationID: operationID}
 	friendNotification(&commID, constant.UserInfoUpdatedNotification, &selfInfoUpdatedTips)
 }
+
+func FriendApplicationNotification(req *pbFriend.AddFriendReq) {
+	FriendApplicationTips := sdkws.FriendApplicationTips{FromToUserID: &sdkws.FromToUserID{}}
+	FriendApplicationTips.FromToUserID.FromUserID = req.CommID.FromUserID
+	FriendApplicationTips.FromToUserID.ToUserID = req.CommID.ToUserID
+	friendNotification(req.CommID, constant.FriendApplicationNotification, &FriendApplicationTips)
+}
+
+func FriendDeletedNotification(req *pbFriend.DeleteFriendReq) {
+	friendDeletedTips := sdkws.FriendDeletedTips{FromToUserID: &sdkws.FromToUserID{}}
+	friendDeletedTips.FromToUserID.FromUserID = req.CommID.FromUserID
+	friendDeletedTips.FromToUserID.ToUserID = req.CommID.ToUserID
+	friendNotification(req.CommID, constant.FriendDeletedNotification, &friendDeletedTips)
+}

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"math/rand"
+	"open-im/pkg/common/constant"
 	"strconv"
 )
 
@@ -23,4 +24,14 @@ func GetMsgID(sendID string) string {
 
 func int64ToString(i int64) string {
 	return strconv.FormatInt(i, 10)
+}
+
+func GetConversationIDBySessionType(sourceID string, sessionType int) string {
+	switch sessionType {
+	case constant.SingleChatType:
+		return "single_" + sourceID
+	case constant.GroupChatType:
+		return "group_" + sourceID
+	}
+	return ""
 }

@@ -102,3 +102,44 @@ func UpdateUserInfo(c *gin.Context) {
 	log.NewInfo(req.OperationID, "UpdateUserInfo api return ", resp)
 	c.JSON(http.StatusOK, resp)
 }
+
+func GetSelfUserInfo(c *gin.Context) {
+	params := api.GetSelfUserInfoReq{}
+	if err := c.BindJSON(&params); err != nil {
+		log.NewError("0", "BindJSON failed ", err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"errCode": http.StatusBadRequest, "errMsg": err.Error()})
+		return
+	}
+	req := &rpc.GetUserInfoReq{}
+
+	utils.CopyStructFields(req, &params)
+	var ok bool
+	ok, req.OpUserID = token_verify.GetUserIDFromToken(c.Request.Header.Get("token"), req.OperationID)
+	if !ok {
+		log.NewError(req.OperationID, "GetUserIDFromToken false ", c.Request.Header.Get("token"))
+		c.JSON(http.StatusInternalServerError, gin.H{"errCode": 500, "errMsg": "GetUserIDFromToken failed"})
+		return
+	}
+
+	req.UserIDList = append(req.UserIDList, req.OpUserID)
+	log.NewInfo(params.OperationID, "GetUserInfo args ", req.String())
+
+	etcdConn := getcdv3.GetConn(config.Config.Etcd.EtcdSchema, strings.Join(config.Config.Etcd.EtcdAddr, ","), config.Config.RpcRegisterName.OpenImUserName)
+	client := rpc.NewUserClient(etcdConn)
+	RpcResp, err := client.GetUserInfo(context.Background(), req)
+	if err != nil {
+		log.NewError(req.OperationID, "GetUserInfo failed ", err.Error(), req.String())
+		c.JSON(http.StatusInternalServerError, gin.H{"errCode": 500, "errMsg": "call  rpc server failed"})
+		return
+	}
+	if len(RpcResp.UserInfoList) == 1 {
+		resp := api.GetSelfUserInfoResp{CommResp: api.CommResp{ErrCode: RpcResp.CommonResp.ErrCode, ErrMsg: RpcResp.CommonResp.ErrMsg}, UserInfo: RpcResp.UserInfoList[0]}
+		resp.Data = jsonData.JsonDataOne(resp.UserInfo)
+		log.NewInfo(req.OperationID, "GetUserInfo api return ", resp)
+		c.JSON(http.StatusOK, resp)
+	} else {
+		resp := api.GetSelfUserInfoResp{CommResp: api.CommResp{ErrCode: RpcResp.CommonResp.ErrCode, ErrMsg: RpcResp.CommonResp.ErrMsg}}
+		log.NewInfo(req.OperationID, "GetUserInfo api return ", resp)
+		c.JSON(http.StatusOK, resp)
+	}
+}

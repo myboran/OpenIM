@@ -3,9 +3,12 @@ package friend
 import (
 	"context"
 	"net"
+	"open-im/pkg/common/db"
 	"strconv"
 	"strings"
+	"time"
 
+	chat "open-im/internal/rpc/msg"
 	"open-im/pkg/common/config"
 	"open-im/pkg/common/constant"
 	imdb "open-im/pkg/common/db/mysql_model/im_mysql_model"
@@ -91,4 +94,87 @@ func (s *friendServer) GetFriendList(ctx context.Context, req *pbFriend.GetFrien
 	}
 	log.NewInfo(req.CommID.OperationID, "rpc GetFriendList ok", pbFriend.GetFriendListResp{FriendInfoList: userInfoList})
 	return &pbFriend.GetFriendListResp{FriendInfoList: userInfoList}, nil
+}
+
+func (s *friendServer) AddFriend(ctx context.Context, req *pbFriend.AddFriendReq) (*pbFriend.AddFriendResp, error) {
+	log.NewInfo(req.CommID.OperationID, "AddFriend args ", req.String())
+	ok := token_verify.CheckAccess(req.CommID.OpUserID, req.CommID.FromUserID)
+	if !ok {
+		log.NewError(req.CommID.OperationID, "CheckAccess false ", req.CommID.OpUserID, req.CommID.FromUserID)
+		return &pbFriend.AddFriendResp{CommonResp: &pbFriend.CommonResp{ErrCode: constant.ErrAccess.ErrCode, ErrMsg: constant.ErrAccess.ErrMsg}}, nil
+	}
+
+	// 不能添加不存在的用户
+	if _, err := imdb.GetUserByUserID(req.CommID.ToUserID); err != nil {
+		log.NewError(req.CommID.OperationID, "GetUserByUserID failed ", err.Error(), req.CommID.ToUserID)
+		return &pbFriend.AddFriendResp{CommonResp: &pbFriend.CommonResp{ErrCode: constant.ErrDB.ErrCode, ErrMsg: constant.ErrDB.ErrMsg}}, nil
+	}
+
+	friendRequest := db.FriendRequest{
+		HandleResult: 0, ReqMsg: req.ReqMsg, CreateTime: time.Now()}
+	utils.CopyStructFields(&friendRequest, req.CommID)
+	// {openIM001 openIM002 0 test add friend 0001-01-01 00:00:00 +0000 UTC   0001-01-01 00:00:00 +0000 UTC }]
+	log.NewDebug(req.CommID.OperationID, "UpdateFriendApplication args ", friendRequest)
+
+	err := imdb.InsertFriendApplication(&friendRequest,
+		map[string]interface{}{"handle_result": 0, "req_msg": friendRequest.ReqMsg, "create_time": friendRequest.CreateTime,
+			"handler_user_id": "", "handle_msg": "", "handle_time": utils.UnixSecondToTime(0), "ex": ""})
+	if err != nil {
+		log.NewError(req.CommID.OperationID, "UpdateFriendApplication failed ", err.Error(), friendRequest)
+		return &pbFriend.AddFriendResp{CommonResp: &pbFriend.CommonResp{ErrCode: constant.ErrDB.ErrCode, ErrMsg: constant.ErrDB.ErrMsg}}, nil
+	}
+
+	chat.FriendApplicationNotification(req)
+	return &pbFriend.AddFriendResp{CommonResp: &pbFriend.CommonResp{}}, nil
+}
+
+func (s *friendServer) DeleteFriend(ctx context.Context, req *pbFriend.DeleteFriendReq) (*pbFriend.DeleteFriendResp, error) {
+	log.NewInfo(req.CommID.OperationID, "DeleteFriend args ", req.String())
+	//Parse token, to find current user information
+	if !token_verify.CheckAccess(req.CommID.OpUserID, req.CommID.FromUserID) {
+		log.NewError(req.CommID.OperationID, "CheckAccess false ", req.CommID.OpUserID, req.CommID.FromUserID)
+		return &pbFriend.DeleteFriendResp{CommonResp: &pbFriend.CommonResp{ErrCode: constant.ErrAccess.ErrCode, ErrMsg: constant.ErrAccess.ErrMsg}}, nil
+	}
+	err := imdb.DeleteSingleFriendInfo(req.CommID.FromUserID, req.CommID.ToUserID)
+	if err != nil {
+		log.NewError(req.CommID.OperationID, "DeleteSingleFriendInfo failed", err.Error(), req.CommID.FromUserID, req.CommID.ToUserID)
+		return &pbFriend.DeleteFriendResp{CommonResp: &pbFriend.CommonResp{ErrCode: constant.ErrAccess.ErrCode, ErrMsg: constant.ErrAccess.ErrMsg}}, nil
+	}
+
+	log.NewInfo(req.CommID.OperationID, "DeleteFriend rpc ok")
+	chat.FriendDeletedNotification(req)
+	return &pbFriend.DeleteFriendResp{CommonResp: &pbFriend.CommonResp{}}, nil
+}
+
+func (s *friendServer) IsFriend(ctx context.Context, req *pbFriend.IsFriendReq) (*pbFriend.IsFriendResp, error) {
+	log.NewInfo(req.CommID.OperationID, req.String())
+	var isFriend bool
+	if !token_verify.CheckAccess(req.CommID.OpUserID, req.CommID.FromUserID) {
+		log.NewError(req.CommID.OperationID, "CheckAccess false ", req.CommID.OpUserID, req.CommID.FromUserID)
+		return &pbFriend.IsFriendResp{ErrCode: constant.ErrAccess.ErrCode, ErrMsg: constant.ErrAccess.ErrMsg}, nil
+	}
+	_, err := imdb.GetFriendRelationshipFromFriend(req.CommID.FromUserID, req.CommID.ToUserID)
+	if err == nil {
+		isFriend = true
+	} else {
+		isFriend = false
+	}
+	log.NewInfo(req.CommID.OperationID, pbFriend.IsFriendResp{Response: isFriend})
+	return &pbFriend.IsFriendResp{Response: isFriend}, nil
+}
+
+func (s *friendServer) IsInBlackList(ctx context.Context, req *pbFriend.IsInBlackListReq) (*pbFriend.IsInBlackListResp, error) {
+	log.NewInfo("IsInBlackList args ", req.String())
+	if !token_verify.CheckAccess(req.CommID.OpUserID, req.CommID.FromUserID) {
+		log.NewError(req.CommID.OperationID, "CheckAccess false ", req.CommID.OpUserID, req.CommID.FromUserID)
+		return &pbFriend.IsInBlackListResp{ErrCode: constant.ErrAccess.ErrCode, ErrMsg: constant.ErrAccess.ErrMsg}, nil
+	}
+
+	var isInBlacklist = false
+	err := imdb.CheckBlack(req.CommID.FromUserID, req.CommID.ToUserID)
+	if err == nil {
+		isInBlacklist = true
+	}
+	log.NewInfo(req.CommID.OperationID, "IsInBlackList rpc ok ", pbFriend.IsInBlackListResp{Response: isInBlacklist})
+	return &pbFriend.IsInBlackListResp{Response: isInBlacklist}, nil
 }

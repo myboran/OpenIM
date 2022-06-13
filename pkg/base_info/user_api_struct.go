@@ -20,3 +20,14 @@ type UpdateSelfUserInfoReq struct {
 type UpdateUserInfoResp struct {
 	CommResp
 }
+
+type GetSelfUserInfoReq struct {
+	OperationID string `json:"operationID" binding:"required"`
+	UserID      string `json:"userID" binding:"required"`
+}
+
+type GetSelfUserInfoResp struct {
+	CommResp
+	UserInfo *open_im_sdk.UserInfo  `json:"-"`
+	Data     map[string]interface{} `json:"data"`
+}

@@ -6,7 +6,8 @@ import (
 )
 
 const (
-	uidPidToken = "UID_PID_TOKEN_STATUS:"
+	uidPidToken                   = "UID_PID_TOKEN_STATUS:"
+	conversationReceiveMessageOpt = "CON_RECV_MSG_OPT:"
 )
 
 func (d *DataBases) Exec(cmd string, key interface{}, args ...interface{}) (interface{}, error) {
@@ -33,4 +34,9 @@ func (d *DataBases) GetTokenMapByUidPid(userID, platformID string) (map[string]i
 	key := uidPidToken + userID + ":" + platformID
 	log.NewDebug("", "get token key is ", key)
 	return redis.IntMap(d.Exec("HGETALL", key))
+}
+
+func (d *DataBases) GetSingleConversationRecvMsgOpt(userID, conversationID string) (int, error) {
+	key := conversationReceiveMessageOpt + userID
+	return redis.Int(d.Exec("HGet", key, conversationID))
 }

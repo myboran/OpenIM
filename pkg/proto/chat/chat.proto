@@ -3,6 +3,12 @@ import "open-im/pkg/proto/sdk_ws/ws.proto";
 option go_package = "./chat;pbChat";
 package pbChat;
 
+message MsgDataToMQ{
+  string token =1;
+  string operationID = 2;
+  server_api_params.MsgData msgData = 3;
+}
+
 
 message SendMsgReq {
   string token =1;

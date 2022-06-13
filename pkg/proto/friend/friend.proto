@@ -1,7 +1,12 @@
 syntax = "proto3";
-import "open-im/pkg/proto/sdk_ws/ws.proto";
+import "sdk_ws/ws.proto";
 option go_package = "./friend;friend";
 package friend;
+
+message CommonResp{
+  int32   errCode = 1;
+  string  errMsg = 2;
+}
 
 message CommID{
   string OpUserID = 1;
@@ -10,16 +15,56 @@ message CommID{
   string FromUserID = 5;
 }
 
+
+message AddFriendReq{
+  CommID CommID = 1;
+  string ReqMsg = 2;
+}
+message AddFriendResp{
+  CommonResp CommonResp = 1;
+}
+
+
 message GetFriendListReq{
   CommID CommID = 1;
 }
-
 message GetFriendListResp{
   int32   ErrCode = 1;
   string  ErrMsg = 2;
   repeated server_api_params.FriendInfo FriendInfoList = 3;
 }
 
+
+message DeleteFriendReq{
+  CommID CommID = 1;
+}
+message DeleteFriendResp{
+  CommonResp CommonResp = 1;
+}
+
+
+message IsInBlackListReq{
+  CommID CommID = 1;
+}
+message IsInBlackListResp{
+  int32   ErrCode = 1;
+  string  ErrMsg = 2;
+  bool    Response = 3;
+}
+
+
+message IsFriendReq{
+  CommID CommID = 1;
+}
+message IsFriendResp{
+  int32   ErrCode = 1;
+  string  ErrMsg = 2;
+  bool    Response = 3;
+}
 service friend{
+  rpc addFriend(AddFriendReq) returns(AddFriendResp);
   rpc getFriendList(GetFriendListReq) returns(GetFriendListResp);
+  rpc deleteFriend(DeleteFriendReq) returns(DeleteFriendResp);
+  rpc isFriend(IsFriendReq) returns(IsFriendResp);
+  rpc isInBlackList(IsInBlackListReq) returns(IsInBlackListResp);
 }

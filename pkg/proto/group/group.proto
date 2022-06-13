@@ -1,0 +1,19 @@
+syntax = "proto3";
+import "open-im/pkg/proto/sdk_ws/ws.proto";
+option go_package = "./group;group";
+package group;
+
+message GetGroupAllMemberReq {
+  string GroupID = 1;
+  string OpUserID = 2; //No verification permission
+  string OperationID = 3;
+}
+message GetGroupAllMemberResp {
+  int32   ErrCode = 1;
+  string  ErrMsg = 2;
+  repeated server_api_params.GroupMemberFullInfo memberList = 3;
+}
+
+service group{
+  rpc getGroupAllMember(GetGroupAllMemberReq) returns(GetGroupAllMemberResp);
+}
